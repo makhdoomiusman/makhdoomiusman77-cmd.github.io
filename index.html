@@ -1,0 +1,411 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Usman Makhdoomi — Data Science</title>
+<link href="https://fonts.googleapis.com/css2?family=Oxanium:wght@300;400;600;800&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#03070f;--s1:#080f1e;--s2:#0d1a2e;--border:#1b3050;
+  --c1:#00ffe7;--c2:#ff6b35;--c3:#7b61ff;--c4:#39ff14;
+  --txt:#cce8ff;--muted:#4a7a9b;
+  --head:'Oxanium',sans-serif;--mono:'DM Mono',monospace;
+}
+html{scroll-behavior:smooth}
+body{background:var(--bg);color:var(--txt);font-family:var(--mono);overflow-x:hidden;font-size:14px;cursor:none}
+
+#bg-canvas{position:fixed;inset:0;z-index:0;pointer-events:none}
+#cur{position:fixed;width:10px;height:10px;background:var(--c1);border-radius:50%;pointer-events:none;z-index:9999;transform:translate(-50%,-50%);mix-blend-mode:screen;box-shadow:0 0 14px var(--c1);transition:background .2s}
+#cur-ring{position:fixed;width:38px;height:38px;border:1px solid rgba(0,255,231,.35);border-radius:50%;pointer-events:none;z-index:9998;transform:translate(-50%,-50%);transition:all .15s ease}
+
+nav{position:fixed;top:0;left:0;right:0;z-index:200;display:flex;align-items:center;justify-content:space-between;padding:1rem 2.5rem;border-bottom:1px solid rgba(27,48,80,.6);backdrop-filter:blur(24px);background:rgba(3,7,15,.8)}
+.logo{font-family:var(--head);font-weight:800;font-size:1.1rem;color:var(--c1);letter-spacing:.05em}
+.logo em{color:var(--muted);font-style:normal}
+.nav-links{display:flex;gap:2rem;list-style:none}
+.nav-links a{color:var(--muted);text-decoration:none;font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;transition:color .2s}
+.nav-links a:hover{color:var(--c1)}
+.nav-badge{font-size:.62rem;padding:.2rem .65rem;border-radius:2px;background:rgba(0,255,231,.07);border:1px solid rgba(0,255,231,.2);color:var(--c1);display:flex;align-items:center;gap:.4rem}
+.pulse{width:6px;height:6px;border-radius:50%;background:var(--c4);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(57,255,20,.4)}50%{opacity:.5;box-shadow:0 0 0 6px rgba(57,255,20,0)}}
+
+.hero{position:relative;min-height:100vh;display:flex;align-items:center;padding:7rem 2.5rem 3rem;z-index:1}
+.hero-inner{max-width:1160px;margin:0 auto;width:100%;display:grid;grid-template-columns:1.1fr 1fr;gap:5rem;align-items:center}
+.hero-eyebrow{font-size:.63rem;letter-spacing:.25em;text-transform:uppercase;color:var(--c1);margin-bottom:1.2rem;display:flex;align-items:center;gap:.8rem}
+.hero-eyebrow::before{content:'';width:2.5rem;height:1px;background:linear-gradient(90deg,transparent,var(--c1))}
+h1{font-family:var(--head);font-size:clamp(2.6rem,6vw,4.8rem);font-weight:800;line-height:.95;letter-spacing:-.02em;margin-bottom:1.4rem}
+h1 .name{display:block}
+h1 .role{display:block;-webkit-text-stroke:1px var(--c1);color:transparent;margin-top:.15em}
+.hero-bio{color:var(--muted);line-height:1.85;font-size:.8rem;margin-bottom:2rem;max-width:440px}
+.hero-bio strong{color:var(--c1)}
+.btns{display:flex;gap:.8rem;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:.5rem;padding:.75rem 1.4rem;border-radius:3px;font-family:var(--mono);font-size:.73rem;letter-spacing:.06em;text-decoration:none;cursor:pointer;border:none;transition:all .22s}
+.btn-p{background:var(--c1);color:#000;font-weight:500}
+.btn-p:hover{background:#fff;box-shadow:0 0 28px rgba(0,255,231,.5);transform:translateY(-2px)}
+.btn-o{background:transparent;border:1px solid var(--border);color:var(--c1)}
+.btn-o:hover{border-color:var(--c1);box-shadow:0 0 18px rgba(0,255,231,.12);transform:translateY(-2px)}
+
+.terminal{background:var(--s1);border:1px solid var(--border);border-radius:8px;overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,.7),inset 0 1px 0 rgba(255,255,255,.03);animation:slideUp .9s .3s both}
+@keyframes slideUp{from{opacity:0;transform:translateY(24px)}to{opacity:1;transform:translateY(0)}}
+.tbar{background:var(--s2);padding:.7rem 1rem;display:flex;align-items:center;gap:.5rem;border-bottom:1px solid var(--border)}
+.td{width:10px;height:10px;border-radius:50%}.td-r{background:#ff5f57}.td-y{background:#febc2e}.td-g{background:#28c840}
+.ttitle{margin-left:auto;font-size:.6rem;color:var(--muted)}
+.tbody{padding:1.4rem 1.5rem;font-size:.74rem;line-height:1.95}
+.tc{color:#2d5a7a}.tk{color:#c084fc}.ts{color:var(--c4)}.tf{color:var(--c1)}.tn{color:#fb923c}.tv{color:#fb7185}.to{color:var(--muted);margin-top:.8rem;padding-top:.8rem;border-top:1px dashed var(--border)}
+.tcur{display:inline-block;width:7px;height:1em;background:var(--c1);animation:blink 1s step-end infinite;vertical-align:text-bottom}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+
+.sec{position:relative;z-index:1;padding:5rem 2.5rem;max-width:1160px;margin:0 auto}
+.sec-tag{font-size:.6rem;color:var(--c1);letter-spacing:.22em;text-transform:uppercase;margin-bottom:.5rem}
+.sec-tag::before{content:'[ '}.sec-tag::after{content:' ]'}
+h2{font-family:var(--head);font-size:clamp(1.7rem,3.5vw,2.6rem);font-weight:800;letter-spacing:-.03em;line-height:1.1;margin-bottom:2.5rem}
+
+.stats-row{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:1px;background:var(--border);border-radius:8px;overflow:hidden;border:1px solid var(--border);margin-bottom:4rem}
+.stat{background:var(--s1);padding:1.5rem;text-align:center}
+.stat-n{font-family:var(--head);font-size:2.1rem;font-weight:800;background:linear-gradient(135deg,var(--c1),var(--c3));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1}
+.stat-l{font-size:.58rem;color:var(--muted);margin-top:.3rem;letter-spacing:.1em;text-transform:uppercase}
+
+.skills-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));gap:1.2rem}
+.sk-card{background:var(--s1);border:1px solid var(--border);border-radius:6px;padding:1.4rem;position:relative;overflow:hidden;transition:all .3s}
+.sk-card::after{content:'';position:absolute;inset:0;background:radial-gradient(circle at var(--mx,50%) var(--my,50%),rgba(0,255,231,.06),transparent 70%);opacity:0;transition:opacity .3s}
+.sk-card:hover::after{opacity:1}
+.sk-card:hover{border-color:rgba(0,255,231,.25);transform:translateY(-4px);box-shadow:0 16px 40px rgba(0,0,0,.5)}
+.sk-top{display:flex;align-items:center;gap:.8rem;margin-bottom:.8rem}
+.sk-icon{font-size:1.3rem}.sk-name{font-family:var(--head);font-size:.9rem;font-weight:600}
+.sk-desc{font-size:.68rem;color:var(--muted);line-height:1.7;margin-bottom:1rem}
+.sk-bars{display:flex;flex-direction:column;gap:.45rem}
+.sk-row{display:flex;align-items:center;gap:.7rem;font-size:.6rem}
+.sk-lbl{color:var(--muted);width:65px;flex-shrink:0}
+.sk-track{flex:1;height:3px;background:var(--border);border-radius:2px;overflow:hidden}
+.sk-fill{height:100%;border-radius:2px;width:0;transition:width 1.3s cubic-bezier(.4,0,.2,1)}
+.fill-c1{background:linear-gradient(90deg,var(--c1),#00aacc)}
+.fill-c2{background:linear-gradient(90deg,var(--c2),#ff9560)}
+.fill-c3{background:linear-gradient(90deg,var(--c3),#a78bfa)}
+.fill-c4{background:linear-gradient(90deg,var(--c4),#80ff50)}
+.sk-pct{color:var(--c1);width:26px;text-align:right}
+
+.proj-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(300px,1fr));gap:1.4rem}
+.proj{background:var(--s1);border:1px solid var(--border);border-radius:8px;overflow:hidden;transition:all .3s}
+.proj:hover{border-color:rgba(0,255,231,.3);transform:translateY(-6px);box-shadow:0 24px 60px rgba(0,0,0,.6)}
+.proj-vis{height:150px;background:var(--s2);border-bottom:1px solid var(--border);position:relative;overflow:hidden}
+.proj-vis canvas{position:absolute;inset:0}
+.proj-body{padding:1.4rem}
+.proj-tags{display:flex;gap:.4rem;flex-wrap:wrap;margin-bottom:.7rem}
+.ptag{font-size:.56rem;padding:.13rem .42rem;border-radius:2px;letter-spacing:.05em;text-transform:uppercase;border:1px solid}
+.ptag-1{background:rgba(0,255,231,.07);border-color:rgba(0,255,231,.2);color:var(--c1)}
+.ptag-2{background:rgba(123,97,255,.08);border-color:rgba(123,97,255,.2);color:#a78bfa}
+.ptag-3{background:rgba(255,107,53,.08);border-color:rgba(255,107,53,.2);color:var(--c2)}
+.proj-title{font-family:var(--head);font-size:.95rem;font-weight:600;margin-bottom:.4rem}
+.proj-desc{font-size:.68rem;color:var(--muted);line-height:1.75;margin-bottom:.9rem}
+.proj-foot{display:flex;align-items:center;justify-content:space-between;font-size:.62rem}
+.proj-metric{color:var(--c4)}
+.proj-link{color:var(--c1);text-decoration:none;display:flex;align-items:center;gap:.3rem;transition:gap .2s}
+.proj-link:hover{gap:.6rem}
+
+.timeline{position:relative;padding-left:2rem}
+.timeline::before{content:'';position:absolute;left:0;top:0;bottom:0;width:1px;background:linear-gradient(to bottom,var(--c1),var(--c3),transparent)}
+.tl-item{position:relative;padding:0 0 2.5rem 2.5rem}
+.tl-dot{position:absolute;left:-2.6rem;top:.25rem;width:12px;height:12px;border-radius:50%;background:var(--c1);border:2px solid var(--bg);box-shadow:0 0 14px var(--c1)}
+.tl-date{font-size:.6rem;color:var(--c1);margin-bottom:.25rem}
+.tl-title{font-family:var(--head);font-size:.95rem;font-weight:600;margin-bottom:.2rem}
+.tl-org{font-size:.68rem;color:var(--muted);margin-bottom:.4rem}
+.tl-desc{font-size:.68rem;color:var(--muted);line-height:1.75}
+.tl-chips{display:flex;gap:.35rem;flex-wrap:wrap;margin-top:.5rem}
+.chip{font-size:.57rem;padding:.13rem .4rem;border-radius:2px;background:var(--s2);border:1px solid var(--border);color:var(--muted)}
+
+.contact-grid{display:grid;grid-template-columns:1fr 1fr;gap:2.5rem;align-items:start}
+.contact-p{font-size:.76rem;color:var(--muted);line-height:1.85;margin-bottom:1.5rem}
+.c-links{display:flex;flex-direction:column;gap:.7rem}
+.c-link{display:flex;align-items:center;gap:.9rem;text-decoration:none;color:var(--muted);font-size:.72rem;padding:.75rem 1rem;border:1px solid var(--border);border-radius:4px;transition:all .22s}
+.c-link:hover{border-color:var(--c1);color:var(--c1);background:rgba(0,255,231,.04);transform:translateX(4px)}
+.c-form{display:flex;flex-direction:column;gap:.9rem}
+.f-lbl{font-size:.6rem;color:var(--c1);letter-spacing:.1em;text-transform:uppercase;display:block;margin-bottom:.3rem}
+.f-in,.f-ta{width:100%;background:var(--s1);border:1px solid var(--border);border-radius:4px;padding:.7rem 1rem;color:var(--txt);font-family:var(--mono);font-size:.73rem;outline:none;transition:border-color .2s,box-shadow .2s}
+.f-in:focus,.f-ta:focus{border-color:var(--c1);box-shadow:0 0 0 3px rgba(0,255,231,.08)}
+.f-ta{height:110px;resize:none}
+
+footer{position:relative;z-index:1;border-top:1px solid var(--border);padding:1.8rem 2.5rem;text-align:center;font-size:.63rem;color:var(--muted)}
+footer span{color:var(--c1)}
+body::after{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.025) 2px,rgba(0,0,0,.025) 4px);pointer-events:none;z-index:1000}
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s,transform .7s}
+.reveal.on{opacity:1;transform:none}
+
+.glitch{position:relative}
+.glitch::before,.glitch::after{content:attr(data-text);position:absolute;left:0;top:0;width:100%;height:100%}
+.glitch::before{color:var(--c3);animation:glitch1 3s infinite;clip-path:polygon(0 20%,100% 20%,100% 40%,0 40%)}
+.glitch::after{color:var(--c2);animation:glitch2 3s infinite;clip-path:polygon(0 60%,100% 60%,100% 80%,0 80%)}
+@keyframes glitch1{0%,94%,100%{transform:translate(0)}95%{transform:translate(-3px,1px)}97%{transform:translate(3px,-1px)}}
+@keyframes glitch2{0%,94%,100%{transform:translate(0)}96%{transform:translate(3px,1px)}98%{transform:translate(-3px,-1px)}}
+
+@media(max-width:768px){
+  .nav-links{display:none}
+  .hero-inner{grid-template-columns:1fr;gap:2.5rem}
+  .hero{padding:6rem 1.5rem 3rem}
+  .sec{padding:3rem 1.5rem}
+  .contact-grid{grid-template-columns:1fr}
+  h1{font-size:2.4rem}
+}
+</style>
+</head>
+<body>
+
+<canvas id="bg-canvas"></canvas>
+<div id="cur"></div>
+<div id="cur-ring"></div>
+
+<nav>
+  <div class="logo">usman<em>_makhdoomi</em></div>
+  <ul class="nav-links">
+    <li><a href="#skills">Skills</a></li>
+    <li><a href="#projects">Projects</a></li>
+    <li><a href="#journey">Journey</a></li>
+    <li><a href="#contact">Contact</a></li>
+  </ul>
+  <div class="nav-badge"><div class="pulse"></div>Open to Hire</div>
+</nav>
+
+<div class="hero" id="home">
+  <div class="hero-inner">
+    <div>
+      <div class="hero-eyebrow">Data Science Trainee · ILS Srinagar</div>
+      <h1>
+        <span class="name glitch" data-text="Usman">Usman</span>
+        <span class="name glitch" data-text="Makhdoomi" style="animation-delay:.3s">Makhdoomi</span>
+        <span class="role">Data Explorer</span>
+      </h1>
+      <p class="hero-bio">
+        Passionate about turning raw data into <strong>meaningful insight</strong>. Currently training at <strong>ILS Srinagar</strong>, building ML models, exploring patterns, and levelling up in <strong>Python, Statistics &amp; Deep Learning</strong>.
+      </p>
+      <div class="btns">
+        <a href="#projects" class="btn btn-p">&#9654; View Projects</a>
+        <a href="#contact" class="btn btn-o">&#8594; Get in Touch</a>
+      </div>
+    </div>
+
+    <div class="terminal">
+      <div class="tbar">
+        <div class="td td-r"></div><div class="td td-y"></div><div class="td td-g"></div>
+        <div class="ttitle">usman_profile.py — python 3.12</div>
+      </div>
+      <div class="tbody">
+        <span class="tc"># ── Data Science Trainee ──────────</span><br>
+        <span class="tk">import</span> <span class="tf">pandas</span> <span class="tk">as</span> pd<br>
+        <span class="tk">import</span> <span class="tf">numpy</span> <span class="tk">as</span> np<br>
+        <span class="tk">from</span> <span class="tf">sklearn</span> <span class="tk">import</span> <span class="tv">ambition</span><br>
+        <br>
+        <span class="tv">usman</span> = {<br>
+        &nbsp;&nbsp;<span class="ts">"name"</span>: <span class="ts">"Usman Makhdoomi"</span>,<br>
+        &nbsp;&nbsp;<span class="ts">"role"</span>: <span class="ts">"DS Trainee @ ILS"</span>,<br>
+        &nbsp;&nbsp;<span class="ts">"education"</span>: <span class="ts">"12th Grade"</span>,<br>
+        &nbsp;&nbsp;<span class="ts">"location"</span>: <span class="ts">"Srinagar, J&amp;K"</span>,<br>
+        &nbsp;&nbsp;<span class="ts">"since"</span>: <span class="tn">2025</span>,<br>
+        &nbsp;&nbsp;<span class="ts">"status"</span>: <span class="ts">"Learning &amp; Building"</span><br>
+        }<br>
+        <br>
+        <span class="tf">model</span>.<span class="tf">fit</span>(dedication, results)<br>
+        <div class="to">
+          $ python usman_profile.py<br>
+          &#10003; Accuracy improving daily <span class="tcur"></span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+<div class="sec">
+  <div class="stats-row reveal">
+    <div class="stat"><div class="stat-n" data-count="2025">0</div><div class="stat-l">Year Started</div></div>
+    <div class="stat"><div class="stat-n" data-count="6">0</div><div class="stat-l">Projects Built</div></div>
+    <div class="stat"><div class="stat-n" data-count="5">0</div><div class="stat-l">Tools Learned</div></div>
+    <div class="stat"><div class="stat-n" data-count="100">0</div><div class="stat-l">Commitment %</div></div>
+  </div>
+</div>
+
+<!-- SKILLS -->
+<div class="sec" id="skills">
+  <div class="sec-tag">Capabilities</div>
+  <h2>Technical<br>Skill Stack</h2>
+  <div class="skills-grid">
+    <div class="sk-card reveal">
+      <div class="sk-top"><div class="sk-icon">🐍</div><div class="sk-name">Python & Data</div></div>
+      <div class="sk-desc">Core language for analysis, data wrangling and building end-to-end ML pipelines from scratch.</div>
+      <div class="sk-bars">
+        <div class="sk-row"><span class="sk-lbl">Python</span><div class="sk-track"><div class="sk-fill fill-c1" data-w="72"></div></div><span class="sk-pct">72%</span></div>
+        <div class="sk-row"><span class="sk-lbl">Pandas</span><div class="sk-track"><div class="sk-fill fill-c1" data-w="65"></div></div><span class="sk-pct">65%</span></div>
+        <div class="sk-row"><span class="sk-lbl">NumPy</span><div class="sk-track"><div class="sk-fill fill-c1" data-w="60"></div></div><span class="sk-pct">60%</span></div>
+      </div>
+    </div>
+    <div class="sk-card reveal">
+      <div class="sk-top"><div class="sk-icon">🤖</div><div class="sk-name">Machine Learning</div></div>
+      <div class="sk-desc">Learning classification, regression and clustering models using scikit-learn and real-world datasets.</div>
+      <div class="sk-bars">
+        <div class="sk-row"><span class="sk-lbl">sklearn</span><div class="sk-track"><div class="sk-fill fill-c3" data-w="60"></div></div><span class="sk-pct">60%</span></div>
+        <div class="sk-row"><span class="sk-lbl">Regression</span><div class="sk-track"><div class="sk-fill fill-c3" data-w="68"></div></div><span class="sk-pct">68%</span></div>
+        <div class="sk-row"><span class="sk-lbl">Clustering</span><div class="sk-track"><div class="sk-fill fill-c3" data-w="55"></div></div><span class="sk-pct">55%</span></div>
+      </div>
+    </div>
+    <div class="sk-card reveal">
+      <div class="sk-top"><div class="sk-icon">📊</div><div class="sk-name">Data Visualisation</div></div>
+      <div class="sk-desc">Communicating findings clearly with Matplotlib, Seaborn and basic Plotly dashboards.</div>
+      <div class="sk-bars">
+        <div class="sk-row"><span class="sk-lbl">Matplotlib</span><div class="sk-track"><div class="sk-fill fill-c2" data-w="70"></div></div><span class="sk-pct">70%</span></div>
+        <div class="sk-row"><span class="sk-lbl">Seaborn</span><div class="sk-track"><div class="sk-fill fill-c2" data-w="65"></div></div><span class="sk-pct">65%</span></div>
+        <div class="sk-row"><span class="sk-lbl">Plotly</span><div class="sk-track"><div class="sk-fill fill-c2" data-w="45"></div></div><span class="sk-pct">45%</span></div>
+      </div>
+    </div>
+    <div class="sk-card reveal">
+      <div class="sk-top"><div class="sk-icon">📐</div><div class="sk-name">Statistics & Maths</div></div>
+      <div class="sk-desc">Probability, hypothesis testing, descriptive statistics — the foundation of all data science work.</div>
+      <div class="sk-bars">
+        <div class="sk-row"><span class="sk-lbl">Statistics</span><div class="sk-track"><div class="sk-fill fill-c4" data-w="65"></div></div><span class="sk-pct">65%</span></div>
+        <div class="sk-row"><span class="sk-lbl">Probability</span><div class="sk-track"><div class="sk-fill fill-c4" data-w="60"></div></div><span class="sk-pct">60%</span></div>
+        <div class="sk-row"><span class="sk-lbl">Linear Alg</span><div class="sk-track"><div class="sk-fill fill-c4" data-w="50"></div></div><span class="sk-pct">50%</span></div>
+      </div>
+    </div>
+    <div class="sk-card reveal">
+      <div class="sk-top"><div class="sk-icon">🗄️</div><div class="sk-name">SQL & Spreadsheets</div></div>
+      <div class="sk-desc">Querying datasets using SQL and data organisation with Excel and Google Sheets.</div>
+      <div class="sk-bars">
+        <div class="sk-row"><span class="sk-lbl">SQL</span><div class="sk-track"><div class="sk-fill fill-c1" data-w="58"></div></div><span class="sk-pct">58%</span></div>
+        <div class="sk-row"><span class="sk-lbl">Excel</span><div class="sk-track"><div class="sk-fill fill-c1" data-w="72"></div></div><span class="sk-pct">72%</span></div>
+        <div class="sk-row"><span class="sk-lbl">G-Sheets</span><div class="sk-track"><div class="sk-fill fill-c1" data-w="65"></div></div><span class="sk-pct">65%</span></div>
+      </div>
+    </div>
+    <div class="sk-card reveal">
+      <div class="sk-top"><div class="sk-icon">🧠</div><div class="sk-name">Deep Learning</div></div>
+      <div class="sk-desc">Exploring neural networks and the fundamentals of deep learning — actively learning TensorFlow basics.</div>
+      <div class="sk-bars">
+        <div class="sk-row"><span class="sk-lbl">TensorFlow</span><div class="sk-track"><div class="sk-fill fill-c3" data-w="30"></div></div><span class="sk-pct">30%</span></div>
+        <div class="sk-row"><span class="sk-lbl">Neural Nets</span><div class="sk-track"><div class="sk-fill fill-c3" data-w="35"></div></div><span class="sk-pct">35%</span></div>
+        <div class="sk-row"><span class="sk-lbl">Backprop</span><div class="sk-track"><div class="sk-fill fill-c3" data-w="28"></div></div><span class="sk-pct">28%</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- PROJECTS -->
+<div class="sec" id="projects">
+  <div class="sec-tag">Work</div>
+  <h2>Featured<br>Projects</h2>
+  <div class="proj-grid">
+    <div class="proj reveal">
+      <div class="proj-vis"><canvas id="c1" width="320" height="150"></canvas></div>
+      <div class="proj-body">
+        <div class="proj-tags"><span class="ptag ptag-1">Python</span><span class="ptag ptag-2">sklearn</span><span class="ptag ptag-3">EDA</span></div>
+        <div class="proj-title">Student Score Predictor</div>
+        <div class="proj-desc">Built a linear regression model to predict student exam scores based on study hours, attendance and prior grades. First end-to-end ML project.</div>
+        <div class="proj-foot"><span class="proj-metric">&#9650; R² Score: 0.91</span><a href="#" class="proj-link">View &#8594;</a></div>
+      </div>
+    </div>
+    <div class="proj reveal">
+      <div class="proj-vis"><canvas id="c2" width="320" height="150"></canvas></div>
+      <div class="proj-body">
+        <div class="proj-tags"><span class="ptag ptag-1">Pandas</span><span class="ptag ptag-2">Seaborn</span><span class="ptag ptag-3">EDA</span></div>
+        <div class="proj-title">Sales Data Analysis</div>
+        <div class="proj-desc">Exploratory data analysis on a retail sales dataset — uncovered seasonal trends, top-performing categories and regional insights using visual storytelling.</div>
+        <div class="proj-foot"><span class="proj-metric">&#9650; 12 Key Insights</span><a href="#" class="proj-link">View &#8594;</a></div>
+      </div>
+    </div>
+    <div class="proj reveal">
+      <div class="proj-vis"><canvas id="c3" width="320" height="150"></canvas></div>
+      <div class="proj-body">
+        <div class="proj-tags"><span class="ptag ptag-3">Classification</span><span class="ptag ptag-2">sklearn</span><span class="ptag ptag-1">Python</span></div>
+        <div class="proj-title">Spam Email Classifier</div>
+        <div class="proj-desc">Text classification pipeline using Naive Bayes and TF-IDF vectorisation to detect spam emails. Trained on the SMS Spam dataset.</div>
+        <div class="proj-foot"><span class="proj-metric">&#9650; 96.2% Accuracy</span><a href="#" class="proj-link">View &#8594;</a></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- JOURNEY -->
+<div class="sec" id="journey">
+  <div class="sec-tag">Experience & Education</div>
+  <h2>My<br>Journey</h2>
+  <div class="timeline">
+    <div class="tl-item reveal">
+      <div class="tl-dot" style="background:var(--c4);box-shadow:0 0 14px var(--c4)"></div>
+      <div class="tl-date">2025 — Present</div>
+      <div class="tl-title">Data Science Trainee</div>
+      <div class="tl-org">ILS (Institute of Learning Sciences) · Srinagar, J&K</div>
+      <div class="tl-desc">Hands-on training in data analysis, machine learning and statistical modelling. Working on real-world datasets, building predictive models and developing end-to-end data pipelines under expert mentorship.</div>
+      <div class="tl-chips"><span class="chip">Python</span><span class="chip">ML</span><span class="chip">Pandas</span><span class="chip">Statistics</span><span class="chip">Visualisation</span></div>
+    </div>
+    <div class="tl-item reveal">
+      <div class="tl-dot" style="background:var(--c1);box-shadow:0 0 14px var(--c1)"></div>
+      <div class="tl-date">Completed 2024</div>
+      <div class="tl-title">Higher Secondary Certificate (+12)</div>
+      <div class="tl-org">J&K State Board of School Education · Srinagar</div>
+      <div class="tl-desc">Completed 12th grade with a strong foundation in Mathematics and Science. Developed an early interest in computing and data-driven problem solving that led to pursuing data science training.</div>
+      <div class="tl-chips"><span class="chip">Mathematics</span><span class="chip">Science</span><span class="chip">12th Pass</span></div>
+    </div>
+    <div class="tl-item reveal">
+      <div class="tl-dot" style="background:var(--c3);box-shadow:0 0 14px var(--c3)"></div>
+      <div class="tl-date">2025 — Ongoing</div>
+      <div class="tl-title">Self-Learning & Certifications</div>
+      <div class="tl-org">Online Platforms</div>
+      <div class="tl-desc">Continuously upskilling through online courses in Python, data analysis and ML fundamentals on Kaggle Learn, Google and YouTube.</div>
+      <div class="tl-chips"><span class="chip">Kaggle</span><span class="chip">Google</span><span class="chip">YouTube DS</span></div>
+    </div>
+  </div>
+</div>
+
+<!-- CONTACT -->
+<div class="sec" id="contact">
+  <div class="sec-tag">Connect</div>
+  <h2>Get In<br>Touch</h2>
+  <div class="contact-grid reveal">
+    <div>
+      <p class="contact-p">I'm actively learning and open to internship opportunities, collaborative projects and mentorship. If you'd like to work together or just talk data — feel free to reach out.</p>
+      <div class="c-links">
+        <a href="mailto:makhdoomiusman777@gmail.com" class="c-link">&#9993; &nbsp;makhdoomiusman777@gmail.com</a>
+        <a href="#" class="c-link">&#128188; &nbsp;linkedin.com/in/usman-makhdoomi</a>
+        <a href="#" class="c-link">&#128025; &nbsp;github.com/usman-makhdoomi</a>
+        <a href="#" class="c-link">&#128205; &nbsp;Srinagar, Jammu & Kashmir</a>
+      </div>
+    </div>
+    <div class="c-form">
+      <div><label class="f-lbl">Your Name</label><input class="f-in" placeholder="Jane Doe" type="text"></div>
+      <div><label class="f-lbl">Email</label><input class="f-in" placeholder="you@example.com" type="email"></div>
+      <div><label class="f-lbl">Message</label><textarea class="f-ta" placeholder="Hi Usman, I'd love to connect…"></textarea></div>
+      <button class="btn btn-p" style="align-self:flex-start">Send Message &#8599;</button>
+    </div>
+  </div>
+</div>
+
+<footer>
+  Built with curiosity & code · <span>Usman Makhdoomi</span> · Srinagar &copy; 2025
+</footer>
+
+<script>
+const cur=document.getElementById('cur'),ring=document.getElementById('cur-ring');
+let mx=0,my=0,rx=0,ry=0;
+document.addEventListener('mousemove',e=>{mx=e.clientX;my=e.clientY;cur.style.left=mx+'px';cur.style.top=my+'px'});
+(function lr(){rx+=(mx-rx)*.12;ry+=(my-ry)*.12;ring.style.left=rx+'px';ring.style.top=ry+'px';requestAnimationFrame(lr)})();
+
+const bgC=document.getElementById('bg-canvas'),bgCtx=bgC.getContext('2d');
+function resizeBg(){bgC.width=innerWidth;bgC.height=innerHeight}resizeBg();
+window.addEventListener('resize',resizeBg);
+const pts=Array.from({length:110},()=>({x:Math.random()*innerWidth,y:Math.random()*innerHeight,vx:(Math.random()-.5)*.3,vy:(Math.random()-.5)*.3}));
+function animBg(){
+  bgCtx.clearRect(0,0,bgC.width,bgC.height);
+  pts.forEach(p=>{p.x=(p.x+p.vx+innerWidth)%innerWidth;p.y=(p.y+p.vy+innerHeight)%innerHeight;bgCtx.beginPath();bgCtx.arc(p.x,p.y,1.5,0,Math.PI*2);bgCtx.fillStyle='rgba(0,255,231,.3)';bgCtx.fill();});
+  pts.forEach((a,i)=>pts.slice(i+1).forEach(b=>{const d=Math.hypot(a.x-b.x,a.y-b.y);if(d<120){bgCtx.beginPath();bgCtx.moveTo(a.x,a.y);bgCtx.lineTo(b.x,b.y);bgCtx.strokeStyle=`rgba(0,255,231,${.13*(1-d/120)})`;bgCtx.lineWidth=.5;bgCtx.stroke()}}));
+  requestAnimationFrame(animBg);
+}animBg();
+
+document.querySelectorAll('.sk-card').forEach(c=>{c.addEventListener('mousemove',e=>{const r=c.getBoundingClientRect();c.style.setProperty('--mx',((e.clientX-r.left)/r.width*100)+'%');c.style.setProperty('--my',((e.clientY-r.top)/r.height*100)+'%');});});
+
+const io=new IntersectionObserver(entries=>{entries.forEach(e=>{if(e.isIntersecting){e.target.classList.add('on');e.target.querySelectorAll('.sk-fill').forEach(b=>{b.style.width=b.dataset.w+'%'});e.target.querySelectorAll('[data-count]').forEach(el=>{const target=+el.dataset.count;let c=0;const step=()=>{c=Math.min(c+Math.ceil(target/40),target);el.textContent=c;if(c<target)requestAnimationFrame(step)};step();});}});},{threshold:.15});
+document.querySelectorAll('.reveal').forEach(el=>io.observe(el));
+
+(function(){const c=document.getElementById('c1'),ctx=c.getContext('2d');const bars=[.55,.72,.61,.88,.70,.91,.65,.83],cols=['#00ffe7','#7b61ff','#00ffe7','#39ff14','#7b61ff','#00ffe7','#39ff14','#7b61ff'];let prog=0,t=0;function draw(){ctx.clearRect(0,0,320,150);bars.forEach((h,i)=>{const bw=24,gap=12,ox=16,x=ox+i*(bw+gap),barH=(h*110)*Math.min(prog,1),y=135-barH;const g=ctx.createLinearGradient(x,y,x,135);g.addColorStop(0,cols[i]);g.addColorStop(1,cols[i]+'22');ctx.shadowColor=cols[i];ctx.shadowBlur=8;ctx.fillStyle=g;ctx.fillRect(x,y,bw,barH);ctx.shadowBlur=0;});ctx.strokeStyle='rgba(26,48,80,.7)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(10,135);ctx.lineTo(310,135);ctx.stroke();const sx=(t*1.5)%320;ctx.strokeStyle='rgba(0,255,231,.12)';ctx.lineWidth=1;ctx.beginPath();ctx.moveTo(sx,0);ctx.lineTo(sx,150);ctx.stroke();prog=Math.min(prog+.018,1);t++;requestAnimationFrame(draw);}draw();})();
+
+(function(){const c=document.getElementById('c2'),ctx=c.getContext('2d');const pts2=Array.from({length:50},()=>({x:20+Math.random()*280,y:15+Math.random()*120,r:Math.random()*3+1.5,col:Math.random()>.5?'#7b61ff':'#ff6b35',ph:Math.random()*Math.PI*2}));let t=0;function draw(){ctx.clearRect(0,0,320,150);for(let i=0;i<=4;i++){const y=15+i*28;ctx.strokeStyle='rgba(26,48,80,.4)';ctx.lineWidth=.5;ctx.beginPath();ctx.moveTo(20,y);ctx.lineTo(300,y);ctx.stroke()}pts2.forEach(p=>{const pulse=Math.sin(t*.04+p.ph)*.5+.5;ctx.beginPath();ctx.arc(p.x,p.y,p.r+pulse*1.5,0,Math.PI*2);ctx.fillStyle=p.col+(Math.floor(100+pulse*120).toString(16));ctx.shadowColor=p.col;ctx.shadowBlur=6+pulse*5;ctx.fill();ctx.shadowBlur=0;});ctx.strokeStyle='rgba(0,255,231,.4)';ctx.lineWidth=1.5;ctx.setLineDash([4,4]);ctx.beginPath();ctx.moveTo(20,115);ctx.lineTo(300,28);ctx.stroke();ctx.setLineDash([]);t++;requestAnimationFrame(draw);}draw();})();
+
+(function(){const c=document.getElementById('c3'),ctx=c.getContext('2d');let t=0;function draw(){ctx.clearRect(0,0,320,150);for(let i=0;i<=3;i++){const y=20+i*34;ctx.strokeStyle='rgba(26,48,80,.4)';ctx.lineWidth=.5;ctx.beginPath();ctx.moveTo(10,y);ctx.lineTo(310,y);ctx.stroke()}ctx.beginPath();ctx.lineWidth=2;ctx.strokeStyle='#39ff14';ctx.shadowColor='#39ff14';ctx.shadowBlur=8;for(let x=0;x<=300;x++){const y=75+Math.sin((x+t)*.04)*28+Math.sin((x+t)*.09)*10;x===0?ctx.moveTo(x+10,y):ctx.lineTo(x+10,y)}ctx.stroke();ctx.shadowBlur=0;ctx.beginPath();ctx.lineWidth=1.5;ctx.setLineDash([5,4]);ctx.strokeStyle='rgba(0,255,231,.7)';ctx.shadowColor='#00ffe7';ctx.shadowBlur=5;for(let x=0;x<=300;x++){const y=75+Math.sin((x+t)*.04+.5)*28+Math.sin((x+t)*.09+.5)*10+Math.sin(x*.025)*7;x===0?ctx.moveTo(x+10,y):ctx.lineTo(x+10,y)}ctx.stroke();ctx.setLineDash([]);ctx.shadowBlur=0;t++;requestAnimationFrame(draw);}draw();})();
+</script>
+</body>
+</html>
